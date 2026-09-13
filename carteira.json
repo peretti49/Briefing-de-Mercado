@@ -1,0 +1,10 @@
+{
+  "atualizado_em": "2026-09-11",
+  "ativos": [
+    {"ticker": "VALE3", "empresa": "Vale", "papel": "Satélite (travado)", "qtde": "167", "preco_medio": "R$ 71,51", "peso_aprox": "~64%", "observacao": "Commodity (minério), correlação com China; risco Alto no app"},
+    {"ticker": "PETR4", "empresa": "Petrobras", "papel": "Satélite (travado)", "qtde": "163", "preco_medio": "R$ 43,37", "peso_aprox": "~34%", "observacao": "Commodity (petróleo) + risco político; risco Alto no app"},
+    {"ticker": "BPAC11", "empresa": "BTG Pactual", "papel": "Núcleo", "qtde": "5", "preco_medio": "—", "peso_aprox": "~1%", "observacao": "Banco de investimento, gestão consistente; risco Baixo no app"},
+    {"ticker": "NVDC34", "empresa": "Nvidia (BDR)", "papel": "Satélite", "qtde": "5", "preco_medio": "—", "peso_aprox": "~0,5%", "observacao": "Growth/tech EUA; alta volatilidade apesar de posição pequena"},
+    {"ticker": "AXIA3", "empresa": "Axia Energia (ex-Eletrobras)", "papel": "Satélite (em transição)", "qtde": "1", "preco_medio": "R$ 50,54", "peso_aprox": "~0,3%", "observacao": "Energia; consenso de research majoritariamente comprador apesar de risco Alto no app"}
+  ]
+}
