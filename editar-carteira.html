@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editar Carteira — Briefing de Mercado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0d;
+    --paper:#f5f3ef;
+    --text:rgba(245,243,239,.92);
+    --text-60:rgba(245,243,239,.60);
+    --text-38:rgba(245,243,239,.38);
+    --line:rgba(245,243,239,.10);
+    --panel:rgba(245,243,239,.035);
+    --panel-strong:rgba(245,243,239,.055);
+    --violet:#9966ff;
+    --violet-glow:rgba(153,102,255,.35);
+    --lime:#ebff70;
+    --lime-glow:rgba(235,255,112,.28);
+    --danger:#ff6b6b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 12% -8%,var(--violet-glow),transparent 55%),
+      radial-gradient(ellipse 700px 500px at 96% 8%,var(--lime-glow),transparent 50%),
+      var(--bg);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:'Barlow',system-ui,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px 100px;}
+  header{padding:48px 0 32px;}
+  .eyebrow{font-size:14px;color:var(--violet);font-weight:600;margin-bottom:14px;}
+  h1{font-size:clamp(30px,5vw,44px);font-weight:900;letter-spacing:-0.02em;color:var(--paper);margin-bottom:14px;}
+  .rule{width:100px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--violet),var(--lime));margin-bottom:16px;}
+  header p{font-size:15px;color:var(--text-60);max-width:480px;}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);margin-bottom:20px;}
+  @media(max-width:600px){.panel{padding:20px 16px;}}
+  .panel h2{font-size:17px;font-weight:700;color:var(--paper);margin-bottom:16px;}
+
+  /* token box */
+  .token-row{display:flex;gap:10px;flex-wrap:wrap;}
+  input[type=password],input[type=text],input[type=number],select{
+    background:var(--panel-strong);
+    border:1px solid var(--line);
+    color:var(--paper);
+    font-family:inherit;
+    font-size:14px;
+    padding:11px 14px;
+    border-radius:10px;
+    outline:none;
+  }
+  input:focus,select:focus{border-color:var(--violet);}
+  .token-row input{flex:1;min-width:200px;}
+  .status{font-size:13px;margin-top:10px;color:var(--text-60);}
+  .status.ok{color:var(--lime);}
+  .status.err{color:var(--danger);}
+  .fineprint{font-size:12.5px;color:var(--text-38);margin-top:10px;line-height:1.6;}
+
+  /* buttons */
+  button{
+    font-family:inherit;font-weight:600;font-size:14px;
+    border:none;border-radius:10px;padding:11px 18px;
+    cursor:pointer;transition:opacity .15s;
+  }
+  button:hover{opacity:.85;}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-primary{background:var(--violet);color:#fff;}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--paper);}
+  .btn-remove{
+    background:transparent;border:1px solid rgba(255,107,107,.35);color:var(--danger);
+    padding:7px 12px;font-size:12.5px;
+  }
+  .btn-save{background:var(--lime);color:#111;font-weight:700;width:100%;padding:14px;font-size:15px;}
+
+  /* asset cards */
+  .asset-card{
+    border-top:1px solid var(--line);
+    padding:16px 0;
+    display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+  }
+  .asset-card:first-child{border-top:none;}
+  .ac-ticker{font-size:19px;font-weight:900;color:var(--paper);letter-spacing:-0.01em;}
+  .ac-meta{font-size:13px;color:var(--text-60);margin-top:3px;}
+  .ac-obs{font-size:12.5px;color:var(--text-38);margin-top:4px;max-width:460px;}
+  .empty{font-size:14px;color:var(--text-38);padding:20px 0;text-align:center;}
+
+  /* form grid */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+  @media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+  .form-grid label{display:block;font-size:12px;color:var(--text-60);margin-bottom:6px;font-weight:600;}
+  .form-grid .full{grid-column:1/-1;}
+  input,select{width:100%;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Briefing de Mercado</div>
+    <h1>Editar carteira</h1>
+    <div class="rule"></div>
+    <p>Adicione ou remova ativos da carteira que o agente cobre todo dia. As mudanças salvam direto no repositório e valem a partir do próximo briefing.</p>
+  </header>
+
+  <!-- ======== TOKEN ======== -->
+  <section class="panel" id="token-panel">
+    <h2>Acesso</h2>
+    <div class="token-row">
+      <input type="password" id="token-input" placeholder="Cole seu token de acesso do GitHub aqui">
+      <button class="btn-primary" id="save-token-btn">Salvar neste navegador</button>
+    </div>
+    <div class="status" id="token-status"></div>
+    <div class="fineprint">
+      O token fica salvo só neste navegador (nunca é enviado a nada além da API do GitHub). Não use esta página em computador compartilhado sem depois clicar em "Esquecer token".
+      <br><button class="btn-ghost" id="forget-token-btn" style="margin-top:8px;padding:6px 12px;font-size:12.5px;">Esquecer token</button>
+    </div>
+  </section>
+
+  <!-- ======== LISTA ATUAL ======== -->
+  <section class="panel">
+    <h2>Ativos na carteira</h2>
+    <div id="asset-list"><div class="empty">Carregando...</div></div>
+  </section>
+
+  <!-- ======== ADICIONAR ======== -->
+  <section class="panel">
+    <h2>Adicionar ativo</h2>
+    <div class="form-grid">
+      <div><label>Ticker</label><input type="text" id="f-ticker" placeholder="Ex.: ITUB4"></div>
+      <div><label>Empresa</label><input type="text" id="f-empresa" placeholder="Ex.: Itaú Unibanco"></div>
+      <div>
+        <label>Papel</label>
+        <select id="f-papel">
+          <option>Núcleo</option>
+          <option>Satélite</option>
+          <option>Satélite (travado)</option>
+          <option>Satélite (em transição)</option>
+        </select>
+      </div>
+      <div><label>Peso aprox.</label><input type="text" id="f-peso" placeholder="Ex.: ~5%"></div>
+      <div><label>Quantidade</label><input type="text" id="f-qtde" placeholder="Ex.: 20"></div>
+      <div><label>Preço médio</label><input type="text" id="f-preco" placeholder="Ex.: R$ 32,10 (ou —)"></div>
+      <div class="full"><label>Observação</label><input type="text" id="f-obs" placeholder="Breve nota sobre o ativo, risco, correlação, etc."></div>
+    </div>
+    <button class="btn-primary" id="add-btn">+ Adicionar à lista</button>
+  </section>
+
+  <button class="btn-save" id="save-btn" disabled>Salvar alterações no GitHub</button>
+  <div class="status" id="save-status" style="text-align:center;margin-top:12px;"></div>
+
+</div>
+
+<script>
+const OWNER = 'peretti49';
+const REPO = 'Briefing-de-Mercado';
+const FILE_PATH = 'carteira.json';
+const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`;
+
+let currentSha = null;
+let ativos = [];
+let dirty = false;
+
+function b64EncodeUnicode(str) {
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+    (m, p1) => String.fromCharCode('0x' + p1)));
+}
+function b64DecodeUnicode(str) {
+  return decodeURIComponent(atob(str).split('').map(c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
+function getToken() { return localStorage.getItem('gh_token') || ''; }
+
+function setTokenStatus(msg, cls) {
+  const el = document.getElementById('token-status');
+  el.textContent = msg;
+  el.className = 'status ' + (cls || '');
+}
+
+function setSaveStatus(msg, cls) {
+  const el = document.getElementById('save-status');
+  el.textContent = msg;
+  el.className = 'status ' + (cls || '');
+}
+
+document.getElementById('save-token-btn').addEventListener('click', () => {
+  const val = document.getElementById('token-input').value.trim();
+  if (!val) return;
+  localStorage.setItem('gh_token', val);
+  document.getElementById('token-input').value = '';
+  setTokenStatus('Token salvo neste navegador.', 'ok');
+  loadCarteira();
+});
+
+document.getElementById('forget-token-btn').addEventListener('click', () => {
+  localStorage.removeItem('gh_token');
+  setTokenStatus('Token removido deste navegador.', '');
+});
+
+function renderList() {
+  const list = document.getElementById('asset-list');
+  if (!ativos.length) {
+    list.innerHTML = '<div class="empty">Nenhum ativo na carteira.</div>';
+    return;
+  }
+  list.innerHTML = ativos.map((a, i) => `
+    <div class="asset-card">
+      <div>
+        <div class="ac-ticker">${a.ticker}</div>
+        <div class="ac-meta">${a.empresa} · ${a.papel} · ${a.peso_aprox} · Qtde: ${a.qtde} · Preço médio: ${a.preco_medio}</div>
+        ${a.observacao ? `<div class="ac-obs">${a.observacao}</div>` : ''}
+      </div>
+      <button class="btn-remove" data-idx="${i}">Remover</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('.btn-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      ativos.splice(Number(btn.dataset.idx), 1);
+      dirty = true;
+      renderList();
+      updateSaveButton();
+    });
+  });
+}
+
+function updateSaveButton() {
+  document.getElementById('save-btn').disabled = !dirty || !getToken();
+}
+
+async function loadCarteira() {
+  const token = getToken();
+  if (!token) {
+    setTokenStatus('Cole o token acima pra carregar a carteira.', '');
+    document.getElementById('asset-list').innerHTML = '<div class="empty">Aguardando token...</div>';
+    return;
+  }
+  try {
+    const res = await fetch(API_BASE, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+    });
+    if (!res.ok) throw new Error('Falha ao buscar (status ' + res.status + ')');
+    const data = await res.json();
+    currentSha = data.sha;
+    const parsed = JSON.parse(b64DecodeUnicode(data.content));
+    ativos = parsed.ativos || [];
+    dirty = false;
+    setTokenStatus('Carteira carregada.', 'ok');
+    renderList();
+    updateSaveButton();
+  } catch (e) {
+    setTokenStatus('Erro ao carregar: ' + e.message + ' (confira o token e o nome do repositório)', 'err');
+    document.getElementById('asset-list').innerHTML = '<div class="empty">Não foi possível carregar.</div>';
+  }
+}
+
+document.getElementById('add-btn').addEventListener('click', () => {
+  const ticker = document.getElementById('f-ticker').value.trim().toUpperCase();
+  const empresa = document.getElementById('f-empresa').value.trim();
+  if (!ticker || !empresa) { setSaveStatus('Preencha pelo menos ticker e empresa.', 'err'); return; }
+  ativos.push({
+    ticker,
+    empresa,
+    papel: document.getElementById('f-papel').value,
+    qtde: document.getElementById('f-qtde').value.trim() || '—',
+    preco_medio: document.getElementById('f-preco').value.trim() || '—',
+    peso_aprox: document.getElementById('f-peso').value.trim() || '—',
+    observacao: document.getElementById('f-obs').value.trim()
+  });
+  ['f-ticker','f-empresa','f-qtde','f-preco','f-peso','f-obs'].forEach(id => document.getElementById(id).value = '');
+  dirty = true;
+  renderList();
+  updateSaveButton();
+  setSaveStatus('Adicionado à lista — clique em "Salvar alterações" pra confirmar.', '');
+});
+
+document.getElementById('save-btn').addEventListener('click', async () => {
+  const token = getToken();
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  setSaveStatus('Salvando...', '');
+  try {
+    const payload = { atualizado_em: new Date().toISOString().slice(0,10), ativos };
+    const content = b64EncodeUnicode(JSON.stringify(payload, null, 2));
+    const res = await fetch(API_BASE, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Atualiza carteira via editor',
+        content,
+        sha: currentSha
+      })
+    });
+    if (!res.ok) throw new Error('status ' + res.status);
+    const data = await res.json();
+    currentSha = data.content.sha;
+    dirty = false;
+    setSaveStatus('Salvo! O próximo briefing já vai usar essa lista.', 'ok');
+    updateSaveButton();
+  } catch (e) {
+    setSaveStatus('Erro ao salvar: ' + e.message, 'err');
+    btn.disabled = false;
+  }
+});
+
+// tenta carregar automaticamente se já houver token salvo
+loadCarteira();
+</script>
+</body>
+</html>
